@@ -1,5 +1,7 @@
 package org.jiamy.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import org.apache.ibatis.annotations.Options;
 import org.jiamy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,9 +23,24 @@ public class UserController {
     UserService userService; // field inject
 
     @GetMapping("/get")
+    @Operation(summary = "user getById")
     public String getById(@RequestParam("id") String id, Model model) {
         model.addAttribute("user", userService.getById(id));
         System.out.println(id);
+        return "user";
+    }
+
+    @GetMapping("/registrationSuccess")
+    @Operation(summary = "registrationSuccess")
+    public String registrationSuccess() {
+        userService.sendRegistrationMessage();
+        return "user";
+    }
+
+    @GetMapping("/sendLoginMessage")
+    @Operation(summary = "sendLoginMessage")
+    public String sendLoginMessage() {
+        userService.sendLoginMessage();
         return "user";
     }
 

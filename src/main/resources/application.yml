@@ -13,3 +13,17 @@ spring:
       max-lifetime: 60000
       maximum-pool-size: 20
       minimum-idle: 1
+#  artemis:
+#    # 指定连接外部Artemis服务器，而不是启动嵌入式服务:
+#    mode: native
+#    # 服务器地址和端口号:
+#    brokerUrl: tcp://localhost:61616 # activemq连接地址
+#    # 连接用户名和口令由创建Artemis服务器时指定:
+#    user: admin
+#    password: password
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
