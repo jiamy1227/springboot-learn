@@ -2,6 +2,7 @@ package org.jiamy.service;
 
 import org.jiamy.amqp.AMQPMessageervice;
 import org.jiamy.amqp.JMSMessageService;
+import org.jiamy.controller.UserController;
 import org.jiamy.entity.User;
 import org.jiamy.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,31 +19,17 @@ public class UserService {
     @Autowired
     UserMapper userMapper;
 
-    //@Autowired
-    JMSMessageService jmsMessageService;
-
-    @Autowired
-    AMQPMessageervice amqpMessageervice;
 
     public User getById(String id){
-        try {
-            jmsMessageService.sendMailMessage();
-        } catch (Exception e) {
-            System.out.println("jms error!");
-        }
+
+        System.out.println("Thread in UserService: " + Thread.currentThread().getId());
+
+        System.out.println(UserController.threadLocalUser.get().getName());
 
         return userMapper.getById(id);
     }
 
     public User getByName(String name){
         return userMapper.getByName(name);
-    }
-
-    public void sendLoginMessage(){
-        amqpMessageervice.sendLoginMessage();
-    }
-
-    public void sendRegistrationMessage(){
-        amqpMessageervice.sendRegistrationMessage();
     }
 }

@@ -27,7 +27,6 @@ public class AuthFilterRegistrationBean extends FilterRegistrationBean {
     class AuthFilter implements Filter {
         @Override
         public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-            System.out.println(userService.getById("5"));
             filterChain.doFilter(servletRequest,servletResponse);
         }
     }
