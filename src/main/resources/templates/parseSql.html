@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECharts 关联关系图 - 矩形区域显示字段</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.0/dist/echarts.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #chart {
+      width: 100%;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+<div id="chart"></div>
+<script>
+  // 表信息
+  const tables = {
+    "SOURCE_TABLE": {
+      tableName: "SOURCE_TABLE",
+      fields:["ID","F0","F1","F2","PASSWORD"],
+      fieldTypes:{"PASSWORD":"STRING","F0":"STRING","ID":"STRING","F1":"STRING","F2":"STRING"},
+      metadata: {
+        "password": "123456",
+        "connector": "jdbc",
+        "table-name": "source_table",
+        "url": "jdbc:mysql://172.17.13.55:3306/data_cloud_uat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8",
+        "username": "root"
+      },
+      color: "#1f77b4", // 设置表的颜色
+      x: 100, // 设置矩形区域的x坐标
+      y: 100, // 设置矩形区域的y坐标
+      width: 200, // 矩形区域的宽度
+      height: 150 // 矩形区域的高度
+    },
+    "SOURCE_TABLE2": {
+      tableName: "SOURCE_TABLE2",
+      fields:["ID","F0","F1","F2","PASSWORD"],
+      fieldTypes:{"PASSWORD":"STRING","F0":"STRING","ID":"STRING","F1":"STRING","F2":"STRING"},
+      metadata: {
+        "password": "123456",
+        "connector": "jdbc",
+        "table-name": "source_table2",
+        "url": "jdbc:mysql://172.17.13.55:3306/data_cloud_uat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8",
+        "username": "root"
+      },
+      color: "#ff7f0e", // 设置表的颜色
+      x: 100, // 设置矩形区域的x坐标
+      y: 400, // 设置矩形区域的y坐标
+      width: 200, // 矩形区域的宽度
+      height: 150 // 矩形区域的高度
+    },
+    "PRINT_TABLE": {
+      tableName: "PRINT_TABLE",
+      fields: ["F0", "F1", "F2", "PASSWORD"],
+      fieldTypes: {
+        "PASSWORD": "STRING",
+        "F0": "STRING",
+        "F1": "STRING",
+        "F2": "STRING"
+      },
+      metadata: {
+        "password": "123456",
+        "connector": "jdbc",
+        "table-name": "print_table",
+        "url": "jdbc:mysql://172.17.13.55:3306/data_cloud_uat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8",
+        "username": "root"
+      },
+      color: "#2ca02c", // 设置表的颜色
+      x: 500, // 设置矩形区域的x坐标
+      y: 300, // 设置矩形区域的y坐标
+      width: 200, // 矩形区域的宽度
+      height: 150 // 矩形区域的高度
+    }
+  };
+
+  // 字段映射信息
+  const fieldMappings = [
+    { sourceTable: "SOURCE_TABLE", targetTable: "PRINT_TABLE", sourceField: "F0", targetField: "F0" },
+    { sourceTable: "SOURCE_TABLE2", targetTable: "PRINT_TABLE", sourceField: "F1", targetField: "F1" },
+    { sourceTable: "SOURCE_TABLE", targetTable: "PRINT_TABLE", sourceField: "F2", targetField: "F2" },
+    { sourceTable: "SOURCE_TABLE2", targetTable: "PRINT_TABLE", sourceField: "PASSWORD", targetField: "PASSWORD" }
+  ];
+
+  // 构造ECharts数据
+  const nodes = [];
+  const links = [];
+  const graphics = [];
+
+  // 添加表节点
+  for (let tableName in tables) {
+    const table = tables[tableName];
+    // 添加表节点
+    nodes.push({
+      id: tableName,
+      name: tableName,
+      symbolSize: 40,
+      itemStyle: {
+        color: table.color
+      },
+      x: table.x,
+      y: table.y
+    });
+
+    // 计算字段的矩形区域内位置
+    const fieldWidth = table.width / table.fields.length;
+    table.fields.forEach((field, index) => {
+      const fieldId = `${tableName}-${field}`;
+      nodes.push({
+        id: fieldId,
+        name: field,
+        symbolSize: 20,
+        itemStyle: {
+          color: table.color
+        },
+        x: table.x + table.width / 2, // 字段的x坐标固定，保持在矩形区域的中心
+        y: table.y + (index + 0.5) * (table.height / (table.fields.length + 1)) // 字段在Y轴上的位置，均匀分布
+      });
+    });
+
+    // 为表添加矩形边框
+    graphics.push({
+      type: 'rect',
+      shape: {
+        x: table.x,
+        y: table.y,
+        width: table.width,
+        height: table.height
+      },
+      style: {
+        fill: 'none',
+        stroke: table.color,
+        lineWidth: 2
+      },
+      z: 10 // 设置z轴层级，确保矩形在前面显示
+    });
+  }
+
+  // 添加字段映射链接
+  fieldMappings.forEach(mapping => {
+    const sourceNode = `${mapping.sourceTable}-${mapping.sourceField}`;
+    const targetNode = `${mapping.targetTable}-${mapping.targetField}`;
+    links.push({
+      source: sourceNode,
+      target: targetNode,
+      lineStyle: {
+        color: '#333', // 设置连接线颜色
+        width: 2
+      },
+      symbol: ['none', 'arrow'], // 添加箭头
+      symbolSize: 8
+    });
+  });
+
+  // 使用ECharts初始化图表
+  const chart = echarts.init(document.getElementById('chart'));
+
+  const option = {
+    title: {
+      text: '表格字段映射关系图 - 矩形区域显示字段',
+      subtext: '使用 ECharts 绘制',
+      left: 'center'
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: function (params) {
+        const data = params.data;
+        if (data.id.includes('-')) {
+          // 如果是字段节点，显示字段类型
+          const [tableName, field] = data.id.split('-');
+          const fieldType = tables[tableName].fieldTypes[field];
+          return `${data.name}: ${fieldType}`;
+        } else {
+          // 如果是表节点，显示表的metadata信息
+          const metadata = tables[data.id].metadata;
+          return `
+            <strong>Table:</strong> ${data.name}<br>
+            <strong>Name:</strong> ${metadata["table-name"]}<br>
+            <strong>URL:</strong> <a href="${metadata.url}" target="_blank">${metadata.url}</a>
+          `;
+        }
+      }
+    },
+    series: [
+      {
+        type: 'graph',
+        layout: 'none', // 使用无布局，手动调整位置
+        roam: true,
+        label: {
+          show: true,
+          position: 'right',
+          formatter: '{b}'
+        },
+        data: nodes,
+        links: links,
+        itemStyle: {
+          normal: {
+            borderColor: '#fff',
+            borderWidth: 1,
+            shadowBlur: 10,
+            shadowColor: '#fff'
+          }
+        },
+        graphic: graphics
+      }
+    ]
+  };
+
+  // 设置图表配置项
+  chart.setOption(option);
+</script>
+</body>
+</html>

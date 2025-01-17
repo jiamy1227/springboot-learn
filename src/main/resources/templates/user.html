@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <!-- 确保在你的页面中通过script标签引入jQuery -->
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -9,5 +10,40 @@
 <body>
     name:<div th:text="${user.name}"></div>
     email:<div th:text="${user.email}"></div>
+
+    <div id="relation-graph" style="width: 600px; height: 400px;"></div>
 </body>
+
+<script>
+    // 初始化ECharts实例
+    var myChart = echarts.init(document.getElementById('relation-graph'));
+
+    // 配置图表选项
+    var option = {
+        title: {
+            text: '关系图示例'
+        },
+        tooltip: {},
+        series: [{
+            type: 'graph',
+            layout: 'force',
+            data: [
+                {name: '奖金'},
+                {name: '部门名称'},
+                // ... 其他节点信息
+            ],
+            links: [
+                {source: '奖金', target: '部门名称'},
+                // ... 其他连接关系
+            ],
+            force: {
+                repulsion: 1000,
+                edgeLength: [50, 100]
+            }
+        }]
+    };
+
+    // 渲染图表
+    myChart.setOption(option);
+</script>
 </html>

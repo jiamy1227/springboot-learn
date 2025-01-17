@@ -2,7 +2,10 @@ package org.jiamy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.ibatis.annotations.Options;
+import org.jiamy.entity.BPatientInfo;
 import org.jiamy.entity.User;
+import org.jiamy.mapper.PatientMapper;
+import org.jiamy.service.MyUserService;
 import org.jiamy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @description:
@@ -25,20 +30,24 @@ public class UserController {
     @Autowired
     UserService userService; // field inject
 
+    @Autowired
+    MyUserService myUserService; // field inject
+
+    @Autowired
+    PatientMapper patientMapper;
+
     @GetMapping("/get")
-    @Operation(summary = "user getById")
-    public String getById(@RequestParam("id") String id, Model model) {
-        User user = new User();
-        user.setName("user in ThreadLocal:" + System.currentTimeMillis());
+    public String getById() {
+        User user = userService.getByName("张三");
+        System.out.println(user.getName());
 
-        threadLocalUser.set(user);
-        System.out.println("Thread in UserController: " + Thread.currentThread().getId());
+        User user2 = myUserService.getByName("张三");
+        System.out.println(user2.getName());
 
-        User user2 = userService.getById(id);
-        model.addAttribute("user", user2);
-        System.out.println(id);
-        System.out.println("清除ThreadLocal中的对象");
-        // threadLocalUser.remove();
+        System.out.println("getById");
+
+        List<BPatientInfo> patientList = patientMapper.list();
+
         return "user";
     }
 

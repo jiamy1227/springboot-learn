@@ -14,12 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
  **/
 @Service
 @Transactional
-public class UserService {
+public class MyUserServiceImpl implements MyUserService {
 
     @Autowired
     UserMapper userMapper;
 
 
+    @Override
     public User getById(String id){
 
         System.out.println("Thread in UserService: " + Thread.currentThread().getId());
@@ -29,6 +30,7 @@ public class UserService {
         return userMapper.getById(id);
     }
 
+    @Override
     public User getByName(String name){
         return userMapper.getByName(name);
     }

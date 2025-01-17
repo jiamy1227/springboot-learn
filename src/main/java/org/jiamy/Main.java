@@ -5,6 +5,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @create: 2024/10/11 16:04
  **/
 @SpringBootApplication
+@EnableTransactionManagement(proxyTargetClass = false)
 public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
